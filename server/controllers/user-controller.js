@@ -6,6 +6,17 @@ import { createCustomError } from "../errors/custom-error.js";
 import User from "../models/user-model.js";
 import "dotenv/config";
 
+// Middleware for checking user.
+const checkUser = asyncWrapper(async (req, res, next) => {
+  const { username } = req.method === "GET" ? req.params : req.body;
+  const exist = await User.findOne({ username });
+  if (!exist || null) {
+    return next(createCustomError("user does not exist", 400));
+  }
+  req.user = username;
+  next();
+});
+
 const getUsers = async (req, res) => {
   const users = await User.find({});
   res.status(200).json({ msg: `Retrieved users successfully`, users });
@@ -53,9 +64,10 @@ const login = asyncWrapper(async (req, res, next) => {
     return res.status(400).json({ msg: "Please enter the credentials" });
 
   const user = await User.findOne({ username });
-  if (!user) {
-    return next(createCustomError("username not found", 400));
-  }
+  console.log(user);
+  // if (!user) {
+  //   return next(createCustomError("username not found", 400));
+  // }
 
   const decodedPwd = await bcrypt.compare(password, user.password);
   if (!decodedPwd) {
@@ -73,7 +85,6 @@ const login = asyncWrapper(async (req, res, next) => {
 
 const getUser = asyncWrapper(async (req, res, next) => {
   const { username } = req.params;
-
   const user = await User.findOne({ username });
   if (!user) {
     return next(createCustomError(`user with ${username} not exist`, 400));
@@ -101,12 +112,66 @@ const updateUser = asyncWrapper(async (req, res, next) => {
 });
 
 const generateOTP = asyncWrapper(async (req, res, next) => {
-  req.app.localVariables.OTP = generator.generate(6, {
+  req.app.locals.OTP = generator.generate(6, {
     lowerCaseAlphabets: false,
     upperCaseAlphabets: false,
     specialChars: false,
   });
-  res.status(201).json({ OTP: req.app.localVariables.OTP });
+  res.status(201).json({ OTP: req.app.locals.OTP });
 });
 
-export { getUsers, register, login, getUser, updateUser, generateOTP };
+const verifyOTP = asyncWrapper(async (req, res, next) => {
+  const { otp } = req.params;
+
+  if (parseInt(req.app.locals.OTP) === parseInt(otp)) {
+    req.app.locals.OTP = null; // reset the OTP value
+    req.app.locals.resetSession = true; // start session for reset password
+    return res.status(201).json({ msg: "verification successful!" });
+  }
+
+  next(createCustomError("Invalid OTP", 400));
+});
+
+const createResetSession = asyncWrapper(async (req, res) => {
+  if (req.app.locals.resetSession) {
+    req.app.locals.resetSession = false; // allows to use this route only once
+    res.status(201).json({ msg: "access granted" });
+  }
+  next(createCustomError("session expired", 400));
+});
+
+const resetPassword = asyncWrapper(async (req, res, next) => {
+  const { username, password } = req.body;
+
+  if (!req.app.locals.resetSession) {
+    return next(createCustomError("Session Expired, Login again", 400));
+  }
+
+  const encodedPwd = await bcrypt.hash(password, 10);
+  const updatedUser = await User.findOneAndUpdate(
+    { username },
+    { password: encodedPwd },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+  if (!updatedUser) {
+    return next(createCustomError("Failed to update the password", 400));
+  }
+
+  res.status(200).json({ msg: "Password updated!" });
+});
+
+export {
+  checkUser,
+  getUsers,
+  register,
+  login,
+  getUser,
+  updateUser,
+  generateOTP,
+  verifyOTP,
+  createResetSession,
+  resetPassword,
+};
