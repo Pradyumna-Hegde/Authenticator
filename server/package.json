@@ -20,5 +20,8 @@
     "nodemailer": "^6.9.1",
     "otp-generator": "^4.0.1",
     "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.21"
   }
 }
