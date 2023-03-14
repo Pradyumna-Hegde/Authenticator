@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authorize, localVariables } from "../middlewares/authorizer.js";
-import registerMail from "../controllers/mail.js";
+import sendSms from "../controllers/sms.js";
 import {
   checkUser,
   getUsers,
@@ -24,7 +24,7 @@ router.get("/createResetSession", createResetSession);
 
 router.post("/register", register);
 router.post("/login", checkUser, login);
-router.post("/registerMail", registerMail);
+router.post("/sendSms", sendSms);
 
 router.patch("/update", authorize, updateUser);
 
