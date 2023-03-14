@@ -27,3 +27,23 @@ const sendEmail = async (to, subject, html) => {
 };
 
 export default sendEmail;
+
+/*
+Add this code carefully
+
+const express = require('express');
+const router = express.Router();
+const { sendEmail } = require('./sendEmail');
+
+router.post('/sendEmail', async (req, res) => {
+  try {
+    const { to, subject, html } = req.body;
+    const response = await sendEmail(to, subject, html);
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
+module.exports = router;
+*/
