@@ -1,0 +1,55 @@
+.glass {
+  background: rgba(255, 255, 255);
+  border-radius: 8px;
+  box-shadow: 0 7px 29px 0px rgb(100 100 111 / 20%);
+  @apply shrink-0 h-fit w-[40%] rounded-md py-8 px-7 min-w-max;
+}
+
+.title {
+  @apply flex flex-col items-center;
+}
+
+.h4 {
+  @apply text-4xl font-bold text-gray-600;
+}
+
+.pageDescription {
+  @apply py-2 text-xl w-2/3 text-center text-gray-500;
+}
+
+.profile_img {
+  @apply w-28 rounded-full shadow-lg cursor-pointer;
+}
+
+.profile_img:hover {
+  box-shadow: 0 7px 29px 0px rgb(100 100 111 / 20%);
+}
+
+.textbox {
+  outline: none;
+  @apply px-5 py-2 w-3/4 text-base border-2 border-gray-300 rounded-md;
+}
+
+.btn {
+  @apply border bg-green-500 w-3/4 py-2 rounded-md text-gray-900 text-lg text-center;
+}
+
+.btn:hover {
+  @apply bg-green-600;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.smallRoute {
+  @apply text-center py-1;
+}
+
+.smallRouteSpan {
+  @apply text-gray-900;
+}
+.smallRouteLink,
+.smallRouteButton {
+  @apply text-blue-700 underline;
+}

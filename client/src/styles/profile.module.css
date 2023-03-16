@@ -1,0 +1,7 @@
+.glass {
+  @apply h-fit w-2/4;
+}
+
+.textbox {
+  @apply w-3/4;
+}
