@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { authorize, localVariables } from "../middlewares/authorizer.js";
-import sendSms from "../controllers/sms.js";
 import {
   checkUser,
   getUsers,
@@ -22,12 +21,11 @@ router.get("/verifyOTP/:otp", verifyOTP);
 router.get("/generateOTP", localVariables, generateOTP);
 router.get("/createResetSession", createResetSession);
 
+router.route("/authenticate").post(checkUser, (req, res) => res.end());
 router.post("/register", register);
 router.post("/login", checkUser, login);
-router.post("/sendSms", sendSms);
 
 router.patch("/update", authorize, updateUser);
-
 router.patch("/resetPassword", checkUser, resetPassword);
 
 export default router;

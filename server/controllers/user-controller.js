@@ -54,7 +54,6 @@ const register = asyncWrapper(async (req, res, next) => {
 
   res.status(200).json({
     msg: "user registration successfull",
-    user: { id: user._id, username: user.username },
   });
 });
 
@@ -64,11 +63,6 @@ const login = asyncWrapper(async (req, res, next) => {
     return res.status(400).json({ msg: "Please enter the credentials" });
 
   const user = await User.findOne({ username });
-  console.log(user);
-  // if (!user) {
-  //   return next(createCustomError("username not found", 400));
-  // }
-
   const decodedPwd = await bcrypt.compare(password, user.password);
   if (!decodedPwd) {
     return next(createCustomError("Incorrect Password", 400));
@@ -117,6 +111,7 @@ const generateOTP = asyncWrapper(async (req, res, next) => {
     upperCaseAlphabets: false,
     specialChars: false,
   });
+  console.log({ OTP: req.app.locals.OTP });
   res.status(201).json({ OTP: req.app.locals.OTP });
 });
 
@@ -132,7 +127,7 @@ const verifyOTP = asyncWrapper(async (req, res, next) => {
   next(createCustomError("Invalid OTP", 400));
 });
 
-const createResetSession = asyncWrapper(async (req, res) => {
+const createResetSession = asyncWrapper(async (req, res, next) => {
   if (req.app.locals.resetSession) {
     req.app.locals.resetSession = false; // allows to use this route only once
     res.status(201).json({ msg: "access granted" });
